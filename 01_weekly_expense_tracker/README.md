@@ -53,6 +53,12 @@ The programs calculate weekly spending totals, daily averages, budget status, an
 * Organising multiple program choices clearly
 * Repeating actions based on conditions
 
+## Learning Scope Note
+
+For Grades D, C, and B, the solutions are intended to use only the programming knowledge covered so far in the module. This helps demonstrate progress through the weekly learning topics and shows that each solution matches the expected stage of study.
+
+For Grade A, students may use more advanced C programming knowledge if they already understand it, even if it has not yet been fully covered in future lectures or seminars. However, the solution should still remain clear, readable, and suitable for the assessment requirements.
+
 ## Assessment Requirements
 
 To achieve a higher grade band, each program must include the requirements of the previous grade band.
