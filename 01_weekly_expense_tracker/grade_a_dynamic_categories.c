@@ -25,6 +25,7 @@ Complete all previous steps, then:
 
 #define MAX_ITEMS 10
 #define MAX_LENGTH 50
+#define WEEKLY_BUDGET 300.0f
 
 int main(void)
 {
@@ -61,7 +62,7 @@ int main(void)
         categories[i][strcspn(categories[i], "\n")] = '\0';
     }
 
-    printf("=== These are the current categories===\n");
+    printf("=== These are the current categories ===\n");
     for (int i = 0; i < number_of_categories; i++)
     {
         printf("%d. %s\n", i + 1, categories[i]);
@@ -74,21 +75,38 @@ int main(void)
         // Input for week 1
         if (i == 0)
         {
-            printf("=== Week 1 spending ===\n");
+            printf("\n=== Week 1 spending ===\n");
+
             for (int i = 0; i < number_of_categories; i++)
             {
                 printf("Input %s spending for week 1: ", categories[i]);
                 scanf("%f", &week1_categories_spendings[i]);
+
+                // Validate negative spending
+                if (week1_categories_spendings[i] < 0)
+                {
+                    printf("Invalid input. Spending cannot be negative.\n");
+                    return 1;
+                }
             }
         }
+
         // Input for week 2
         else if (i == 1)
         {
-            printf("=== Week 2 spending ===\n");
+            printf("\n=== Week 2 spending ===\n");
+
             for (int i = 0; i < number_of_categories; i++)
             {
                 printf("Input %s spending for week 2: ", categories[i]);
                 scanf("%f", &week2_categories_spendings[i]);
+
+                // Validate negative spending
+                if (week2_categories_spendings[i] < 0)
+                {
+                    printf("Invalid input. Spending cannot be negative.\n");
+                    return 1;
+                }
             }
         }
     }
@@ -100,19 +118,31 @@ int main(void)
     {
         char *current_cat = categories[i];
         float current_spending = week1_categories_spendings[i];
+
         printf("%s: $%.2f\n", current_cat, current_spending);
     }
 
     for (int i = 0; i < number_of_categories; i++)
     {
         float current_spending = week1_categories_spendings[i];
+
         week1_total += current_spending;
     }
 
-    week1_daily_average = week1_total / 7;
+    week1_daily_average = week1_total / 7.0f;
 
     printf("Week 1 total spending: $%.2f\n", week1_total);
     printf("Week 1 daily average spending: $%.2f\n", week1_daily_average);
+
+    // Week 1 budget status
+    if (week1_total <= WEEKLY_BUDGET)
+    {
+        printf("Week 1 budget status: Within budget\n");
+    }
+    else
+    {
+        printf("Week 1 budget status: Over budget\n");
+    }
 
     // Week 2 summary
     printf("\n=== Week 2 summary ===\n");
@@ -121,22 +151,60 @@ int main(void)
     {
         char *current_cat = categories[i];
         float current_spending = week2_categories_spendings[i];
+
         printf("%s: $%.2f\n", current_cat, current_spending);
     }
 
     for (int i = 0; i < number_of_categories; i++)
     {
         float current_spending = week2_categories_spendings[i];
+
         week2_total += current_spending;
     }
 
-    week2_daily_average = week2_total / 7;
+    week2_daily_average = week2_total / 7.0f;
 
     printf("Week 2 total spending: $%.2f\n", week2_total);
     printf("Week 2 daily average spending: $%.2f\n", week2_daily_average);
 
-    // Budget status
-    printf("\n=== Budget status ===\n");
+    // Week 2 budget status
+    if (week2_total <= WEEKLY_BUDGET)
+    {
+        printf("Week 2 budget status: Within budget\n");
+    }
+    else
+    {
+        printf("Week 2 budget status: Over budget\n");
+    }
+
+    // Per-category spending trends
+    printf("\n=== Per-category spending trends ===\n");
+
+    for (int i = 0; i < number_of_categories; i++)
+    {
+        printf("%s: ", categories[i]);
+
+        if (week1_categories_spendings[i] < week2_categories_spendings[i])
+        {
+            printf("Spending increased from $%.2f to $%.2f\n",
+                   week1_categories_spendings[i],
+                   week2_categories_spendings[i]);
+        }
+        else if (week1_categories_spendings[i] > week2_categories_spendings[i])
+        {
+            printf("Spending decreased from $%.2f to $%.2f\n",
+                   week1_categories_spendings[i],
+                   week2_categories_spendings[i]);
+        }
+        else
+        {
+            printf("Spending stayed the same at $%.2f\n",
+                   week1_categories_spendings[i]);
+        }
+    }
+
+    // Overall spending trend
+    printf("\n=== Overall spending trend ===\n");
 
     float difference = fabsf(week2_total - week1_total);
 
@@ -146,12 +214,21 @@ int main(void)
     }
     else if (week1_total < week2_total)
     {
-        printf("Spending increased with $%.2f", difference);
+        printf("Spending increased by $%.2f\n", difference);
     }
     else
     {
-        printf("Spending decreased with $%.2f", difference);
+        printf("Spending decreased by $%.2f\n", difference);
     }
+
+    // Final summary
+    printf("\n=== Final summary ===\n");
+
+    printf("Week 1 total: $%.2f\n", week1_total);
+    printf("Week 2 total: $%.2f\n", week2_total);
+
+    printf("Week 1 daily average: $%.2f\n", week1_daily_average);
+    printf("Week 2 daily average: $%.2f\n", week2_daily_average);
 
     return 0;
 }
