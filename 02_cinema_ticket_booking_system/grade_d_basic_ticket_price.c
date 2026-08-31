@@ -28,10 +28,18 @@ Example Outcome:
 
 #include <stdio.h>
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 int main(void)
 {
-    char movie_type = 'x';  // A - Action, C - Comedy, H - Horror
-    char ticket_type = 'm'; // S - Standard, P - Premium
+#ifdef _WIN32
+    SetConsoleOutputCP(CP_UTF8);
+#endif
+
+    char movie_type = 'A';  // A - Action, C - Comedy, H - Horror
+    char ticket_type = 'S'; // S - Standard, P - Premium
     float ticket_price = 0.0f;
 
     char error_message_movies[] = "Invalid movie type code.";
@@ -133,7 +141,7 @@ int main(void)
         return 1;
     }
 
-    printf("\nTicket price: $%.2f", ticket_price);
+    printf("\nTicket price: £%.2f", ticket_price);
 
     return 0;
 }
