@@ -8,7 +8,7 @@
 
 int main(void)
 {
-    // Array declared as constant, so no modification allowed
+    // Array containing eight book titles in mixed alphabetical order
     const char *books[8] = {
         "Jane Eyre",
         "East of Eden",
@@ -19,12 +19,14 @@ int main(void)
         "From a Buick 8",
         "Animal Farm"};
 
-    // Get the length of the array
+    // Get the length of the array (number of books)
     int count = sizeof(books) / sizeof(books[0]);
+
+    // The first title remains unchanged
+    const char *first_item = books[0];
 
     for (int i = 0; i < count; i++)
     {
-        const char *first_item = books[0];
         const char *current_item = books[i];
 
         printf("Current Title: %s\n", current_item);
