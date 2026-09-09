@@ -1,6 +1,6 @@
-# QH0305 – Problem Solving in C
+# QHO305 – Problem Solving in C
 
-This repository contains my programming work for the **QH0305 Problem Solving** module, part of the BSc (Hons) Computer Science / BSc (Hons) Cyber Security programme.
+This repository contains my programming work for the **QHO305 Problem Solving** module, part of the BSc (Hons) Computer Science / BSc (Hons) Cyber Security programme.
 
 The repository documents my progression through the module using the **C programming language**, with seven practical programming assessment tasks and a final reflective assessment.
 
@@ -200,7 +200,7 @@ The projects in this repository are written using:
 
 ## Purpose of This Repository
 
-This repository serves as a structured record of my development throughout the **QH0305 Problem Solving** module.
+This repository serves as a structured record of my development throughout the **QHO305 Problem Solving** module.
 
 Rather than containing only final solutions, it demonstrates progression from basic C programs to more structured applications involving arrays, strings, functions, algorithms, structures, and persistent file storage.
 
