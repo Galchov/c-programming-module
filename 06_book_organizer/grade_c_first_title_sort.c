@@ -1,8 +1,8 @@
 /*
     This program stores eight book titles in deliberately mixed alphabetical order.
-    It displays the catalogue before and after performing one comparison pass.
-    During the pass, each title is compared case-insensitively with the title at
-    index 0, and an earlier alphabetical title is swapped into the first position.
+    It displays the catalogue before and after one comparison pass.
+    During the pass, each title is compared case-insensitively with the title
+    at index 0, and an earlier alphabetical title is swapped into that position.
 */
 
 #include <stdio.h>
@@ -12,41 +12,39 @@
 #define BOOK_COUNT 8
 #define TITLE_LENGTH 100
 
-// Compare two strings alphabetically while ignoring uppercase and lowercase differences
+// Compare two book titles alphabetically while ignoring uppercase and lowercase
 int compare_ignore_case(const char first[], const char second[])
 {
     int i = 0;
 
-    // Compare corresponding characters until one of the strings ends
+    // Compare matching characters until one of the strings ends
     while (first[i] != '\0' && second[i] != '\0')
     {
-        // Convert both characters to lowercase before comparing them
         char first_char = (char)tolower((unsigned char)first[i]);
         char second_char = (char)tolower((unsigned char)second[i]);
 
-        // The first string comes earlier alphabetically
+        // The first title comes earlier alphabetically
         if (first_char < second_char)
         {
             return -1;
         }
 
-        // The first string comes later alphabetically
+        // The first title comes later alphabetically
         if (first_char > second_char)
         {
             return 1;
         }
 
-        // Move to the next character
         i++;
     }
 
-    // Both strings are identical
+    // Both titles are identical
     if (first[i] == '\0' && second[i] == '\0')
     {
         return 0;
     }
 
-    // The shorter string comes first alphabetically
+    // If the first title ends first, it comes earlier alphabetically
     if (first[i] == '\0')
     {
         return -1;
@@ -68,7 +66,7 @@ int main(void)
         "From a Buick 8",
         "Animal Farm"};
 
-    // Temporary string used when swapping two book titles
+    // Temporary string used when swapping two titles
     char temp[TITLE_LENGTH];
 
     // Display the catalogue before the comparison pass
@@ -79,10 +77,10 @@ int main(void)
         printf("\"%s\"\n", books[i]);
     }
 
-    // Compare every remaining title with the title currently at index 0
+    // Compare each title with the title currently stored at index 0
     for (int i = 1; i < BOOK_COUNT; i++)
     {
-        // If the current title comes earlier alphabetically, swap the two titles
+        // Swap if the current title comes earlier alphabetically
         if (compare_ignore_case(books[i], books[0]) < 0)
         {
             strcpy(temp, books[0]);
