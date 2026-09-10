@@ -1,62 +1,18 @@
 /*
     This program stores eight book titles in deliberately mixed alphabetical order.
-    It displays the catalogue before and after one comparison pass.
-    During the pass, each title is compared case-insensitively with the title
-    at index 0, and an earlier alphabetical title is swapped into that position.
+    It displays the catalogue before and after one case-insensitive comparison pass.
+    During the pass, each title is compared with the title at index 0, and any
+    alphabetically earlier title is swapped into the first position.
 */
 
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 
-#define BOOK_COUNT 8
-#define TITLE_LENGTH 100
-
-// Compare two book titles alphabetically while ignoring uppercase and lowercase
-int compare_ignore_case(const char first[], const char second[])
-{
-    int i = 0;
-
-    // Compare matching characters until one of the strings ends
-    while (first[i] != '\0' && second[i] != '\0')
-    {
-        char first_char = (char)tolower((unsigned char)first[i]);
-        char second_char = (char)tolower((unsigned char)second[i]);
-
-        // The first title comes earlier alphabetically
-        if (first_char < second_char)
-        {
-            return -1;
-        }
-
-        // The first title comes later alphabetically
-        if (first_char > second_char)
-        {
-            return 1;
-        }
-
-        i++;
-    }
-
-    // Both titles are identical
-    if (first[i] == '\0' && second[i] == '\0')
-    {
-        return 0;
-    }
-
-    // If the first title ends first, it comes earlier alphabetically
-    if (first[i] == '\0')
-    {
-        return -1;
-    }
-
-    return 1;
-}
-
 int main(void)
 {
     // Store eight book titles in deliberately mixed alphabetical order
-    char books[BOOK_COUNT][TITLE_LENGTH] = {
+    char books[8][100] = {
         "Jane Eyre",
         "East of Eden",
         "The Hobbit, or There and Back Again",
@@ -66,36 +22,95 @@ int main(void)
         "From a Buick 8",
         "Animal Farm"};
 
-    // Temporary string used when swapping two titles
-    char temp[TITLE_LENGTH];
+    // Calculate the number of books stored in the array
+    int book_count = sizeof(books) / sizeof(books[0]);
+
+    // Temporary storage used when two book titles are swapped
+    char temporary_title[100];
 
     // Display the catalogue before the comparison pass
-    printf("Before:\n");
+    printf("Before: ");
 
-    for (int i = 0; i < BOOK_COUNT; i++)
+    for (int current_index = 0; current_index < book_count; current_index++)
     {
-        printf("\"%s\"\n", books[i]);
+        printf("\"%s\"", books[current_index]);
+
+        if (current_index < book_count - 1)
+        {
+            printf(", ");
+        }
     }
 
-    // Compare each title with the title currently stored at index 0
-    for (int i = 1; i < BOOK_COUNT; i++)
+    printf("\n");
+
+    // Perform one pass and compare every title with the title at index 0
+    for (int current_index = 1; current_index < book_count; current_index++)
     {
-        // Swap if the current title comes earlier alphabetically
-        if (compare_ignore_case(books[i], books[0]) < 0)
+        int character_index = 0;
+        int comparison_result = 0;
+
+        // Compare both titles one character at a time while ignoring letter case
+        while (books[current_index][character_index] != '\0' &&
+               books[0][character_index] != '\0')
         {
-            strcpy(temp, books[0]);
-            strcpy(books[0], books[i]);
-            strcpy(books[i], temp);
+            int current_character =
+                tolower((unsigned char)books[current_index][character_index]);
+
+            int first_character =
+                tolower((unsigned char)books[0][character_index]);
+
+            if (current_character < first_character)
+            {
+                comparison_result = -1;
+                break;
+            }
+            else if (current_character > first_character)
+            {
+                comparison_result = 1;
+                break;
+            }
+
+            character_index++;
+        }
+
+        // If matching text ends at different points, the shorter title comes first
+        if (comparison_result == 0)
+        {
+            if (books[current_index][character_index] == '\0' &&
+                books[0][character_index] != '\0')
+            {
+                comparison_result = -1;
+            }
+            else if (books[current_index][character_index] != '\0' &&
+                     books[0][character_index] == '\0')
+            {
+                comparison_result = 1;
+            }
+        }
+
+        // Swap with index 0 if the current title comes earlier alphabetically
+        if (comparison_result < 0)
+        {
+            strcpy(temporary_title, books[0]);
+            strcpy(books[0], books[current_index]);
+            strcpy(books[current_index], temporary_title);
         }
     }
 
     // Display the catalogue after the comparison pass
-    printf("\nAfter:\n");
+    printf("After:  ");
 
-    for (int i = 0; i < BOOK_COUNT; i++)
+    for (int current_index = 0; current_index < book_count; current_index++)
     {
-        printf("\"%s\"\n", books[i]);
+        printf("\"%s\"", books[current_index]);
+
+        if (current_index < book_count - 1)
+        {
+            printf(", ");
+        }
     }
+
+    printf("\n");
 
     return 0;
 }
