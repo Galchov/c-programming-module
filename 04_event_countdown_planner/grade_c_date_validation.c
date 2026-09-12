@@ -1,262 +1,260 @@
 /*
-    This program asks the user to enter the current date and an event date
-    in 2026. It uses the correct number of days for each month and validates
-    that each month and day entered is valid.
+    This program asks for the current day and month, then the event day
+    and month. It validates both dates using the real month lengths for
+    2026, including 28 days in February.
 
-    The program converts both dates into their accurate day numbers within
-    the year, calculates the number of days between them, and displays
-    whether the event is today, coming soon, later in the year, or has
-    already passed.
+    Each date is converted into its accurate day number within the year.
+    The difference between those numbers gives the days until the event.
+    The program reports Today for 0 days, Coming soon for 1-7 days, Later
+    in the year for more than 7 days, or Already passed for a past event.
+    A past event also produces an error message without a negative count.
+
+    Input must be one positive whole number per line, using digits only.
+    Spaces or tabs around a number are allowed. Invalid input ends the
+    program immediately, and impossible dates are rejected as soon as
+    both the day and month are known.
 */
 
 #include <stdio.h>
 
 int main(void)
 {
-    int current_day;
-    int current_month;
-    int event_day;
-    int event_month;
-
-    int current_month_days;
-    int event_month_days;
-
-    int current_day_number;
-    int event_day_number;
+    // The first completed date fills the current value; the second fills the event.
+    int current_day_number = 0;
+    int event_day_number = 0;
     int days_until_event;
 
+    // These variables are reused while entering each of the two dates.
+    int date_number;
+    int date_part;
+    int day;
     int month;
+    int day_number;
 
-    const int MIN_DAY = 1;
-    const int MAX_DAY = 31;
-    const int MIN_MONTH = 1;
-    const int MAX_MONTH = 12;
+    // Calendar values used for validation and adding earlier months.
+    int days_in_month;
+    int month_number;
 
-    const char day_error_message[] =
-        "Invalid day. Please enter a day between 1 and 31.";
+    // Scalar variables allow complete input validation without an input array.
+    int input_value;
+    int input_limit;
+    int input_character;
+    int has_digits;
+    int number_finished;
 
-    const char month_day_error_message[] =
-        "Invalid day for the selected month.";
+    // Constants use snake_case, just like the other identifiers.
+    const int number_of_dates = 2;
+    const int parts_per_date = 2;
+    const int min_value = 1;
+    const int max_month = 12;
+    const int max_day = 31;
+    const int coming_soon_limit = 7;
 
-    const char month_error_message[] =
-        "Invalid month. Please enter a month between 1 and 12.";
-
-    const char input_error_message[] =
-        "Invalid input. Please enter a whole number.";
-
-    // Get and validate the current day.
-    printf("Enter current day: ");
-
-    if (scanf("%d", &current_day) != 1)
+    // Enter the current date first and the event date second.
+    for (date_number = 1; date_number <= number_of_dates; date_number++)
     {
-        printf("%s\n", input_error_message);
-        return 1;
-    }
+        day = 0;
+        month = 0;
 
-    if (current_day < MIN_DAY || current_day > MAX_DAY)
-    {
-        printf("%s\n", day_error_message);
-        return 1;
-    }
+        // Each date contains two inputs: day followed by month.
+        for (date_part = 1; date_part <= parts_per_date; date_part++)
+        {
+            if (date_number == 1)
+            {
+                printf("Enter current ");
+            }
+            else
+            {
+                printf("Enter event ");
+            }
 
-    // Get and validate the current month.
-    printf("Enter current month: ");
+            // Choose the prompt and valid range for this part of the date.
+            if (date_part == 1)
+            {
+                printf("day: ");
+                input_limit = max_day;
+            }
+            else
+            {
+                printf("month: ");
+                input_limit = max_month;
+            }
 
-    if (scanf("%d", &current_month) != 1)
-    {
-        printf("%s\n", input_error_message);
-        return 1;
-    }
+            // Reset the number and input flags before reading this line.
+            input_value = 0;
+            has_digits = 0;
+            number_finished = 0;
 
-    if (current_month < MIN_MONTH || current_month > MAX_MONTH)
-    {
-        printf("%s\n", month_error_message);
-        return 1;
-    }
+            // getchar returns a character or EOF, so store its result in an int.
+            input_character = getchar();
 
-    // Determine the correct number of days in the current month.
-    switch (current_month)
-    {
-    case 1:
-    case 3:
-    case 5:
-    case 7:
-    case 8:
-    case 10:
-    case 12:
-        current_month_days = 31;
-        break;
+            // Check characters until Enter is pressed or input ends.
+            while (input_character != '\n' && input_character != EOF)
+            {
+                if (input_character >= '0' && input_character <= '9')
+                {
+                    // Spaces inside a number or between two numbers are invalid.
+                    if (number_finished == 1)
+                    {
+                        printf("Invalid input. Enter one whole number per line.\n");
+                        return 1;
+                    }
 
-    case 4:
-    case 6:
-    case 9:
-    case 11:
-        current_month_days = 30;
-        break;
+                    // Convert the character to a digit and append it to the value.
+                    // The previous value is at most 31, so this cannot overflow.
+                    input_value = input_value * 10 + (input_character - '0');
+                    has_digits = 1;
 
-    case 2:
-        current_month_days = 28;
-        break;
-    }
+                    // Reject an excessive value before another digit can enlarge it.
+                    if (input_value > input_limit)
+                    {
+                        printf("Invalid input. Enter a number between %d and %d.\n",
+                               min_value, input_limit);
+                        return 1;
+                    }
+                }
+                else if (input_character == ' ' || input_character == '\t' ||
+                         input_character == '\r')
+                {
+                    // Allow spaces and tabs before or after the digits.
+                    if (has_digits == 1)
+                    {
+                        number_finished = 1;
+                    }
+                }
+                else
+                {
+                    // Reject letters, decimal points, signs, and other symbols.
+                    printf("Invalid input. Use digits only for the whole number.\n");
+                    return 1;
+                }
 
-    // Validate the current day against the selected month.
-    if (current_day > current_month_days)
-    {
-        printf("%s\n", month_day_error_message);
-        return 1;
-    }
+                input_character = getchar();
+            }
 
-    // Separate the current date inputs from the event date inputs.
-    printf("\n");
+            // A blank line or EOF before any digits is not a valid entry.
+            if (has_digits == 0)
+            {
+                printf("Invalid input. No number was entered.\n");
+                return 1;
+            }
 
-    // Get and validate the event day.
-    printf("Enter event day: ");
+            // Day and month values start at 1; zero is not a calendar date.
+            if (input_value < min_value)
+            {
+                printf("Invalid input. Enter a number between %d and %d.\n",
+                       min_value, input_limit);
+                return 1;
+            }
 
-    if (scanf("%d", &event_day) != 1)
-    {
-        printf("%s\n", input_error_message);
-        return 1;
-    }
+            // Store this value only after its format and range have been checked.
+            if (date_part == 1)
+            {
+                day = input_value;
+            }
+            else
+            {
+                month = input_value;
+            }
+        }
 
-    if (event_day < MIN_DAY || event_day > MAX_DAY)
-    {
-        printf("%s\n", day_error_message);
-        return 1;
-    }
-
-    // Get and validate the event month.
-    printf("Enter event month: ");
-
-    if (scanf("%d", &event_month) != 1)
-    {
-        printf("%s\n", input_error_message);
-        return 1;
-    }
-
-    if (event_month < MIN_MONTH || event_month > MAX_MONTH)
-    {
-        printf("%s\n", month_error_message);
-        return 1;
-    }
-
-    // Determine the correct number of days in the event month.
-    switch (event_month)
-    {
-    case 1:
-    case 3:
-    case 5:
-    case 7:
-    case 8:
-    case 10:
-    case 12:
-        event_month_days = 31;
-        break;
-
-    case 4:
-    case 6:
-    case 9:
-    case 11:
-        event_month_days = 30;
-        break;
-
-    case 2:
-        event_month_days = 28;
-        break;
-    }
-
-    // Validate the event day against the selected month.
-    if (event_day > event_month_days)
-    {
-        printf("%s\n", month_day_error_message);
-        return 1;
-    }
-
-    // Start the current date calculation with the current day.
-    current_day_number = current_day;
-
-    // Add all complete months before the current month.
-    for (month = 1; month < current_month; month++)
-    {
+        // Find the actual day limit for the selected month in 2026.
         switch (month)
         {
-        case 1:
-        case 3:
-        case 5:
-        case 7:
-        case 8:
-        case 10:
-        case 12:
-            current_day_number += 31;
+        case 2:
+            days_in_month = 28;
             break;
-
         case 4:
         case 6:
         case 9:
         case 11:
-            current_day_number += 30;
+            days_in_month = 30;
             break;
-
-        case 2:
-            current_day_number += 28;
+        default:
+            days_in_month = 31;
             break;
         }
-    }
 
-    // Start the event date calculation with the event day.
-    event_day_number = event_day;
-
-    // Add all complete months before the event month.
-    for (month = 1; month < event_month; month++)
-    {
-        switch (month)
+        // Reject an impossible date before asking for any further input.
+        if (day > days_in_month)
         {
-        case 1:
-        case 3:
-        case 5:
-        case 7:
-        case 8:
-        case 10:
-        case 12:
-            event_day_number += 31;
-            break;
+            if (date_number == 1)
+            {
+                printf("Invalid current date. ");
+            }
+            else
+            {
+                printf("Invalid event date. ");
+            }
 
-        case 4:
-        case 6:
-        case 9:
-        case 11:
-            event_day_number += 30;
-            break;
-
-        case 2:
-            event_day_number += 28;
-            break;
+            printf("Month %d has only %d days in 2026.\n", month, days_in_month);
+            return 1;
         }
+
+        // Start with the day, then add every complete month before this one.
+        day_number = day;
+
+        for (month_number = 1; month_number < month; month_number++)
+        {
+            switch (month_number)
+            {
+            case 2:
+                day_number += 28;
+                break;
+            case 4:
+            case 6:
+            case 9:
+            case 11:
+                day_number += 30;
+                break;
+            default:
+                day_number += 31;
+                break;
+            }
+        }
+
+        // Keep the calculated day number for the appropriate date.
+        if (date_number == 1)
+        {
+            current_day_number = day_number;
+        }
+        else
+        {
+            event_day_number = day_number;
+        }
+
+        // Separate the two prompt groups and leave space before the results.
+        printf("\n");
     }
 
-    // Calculate the accurate number of days between the dates.
+    // Positive means a future event, zero means today, and negative means past.
     days_until_event = event_day_number - current_day_number;
 
-    // Separate the input section from the program output.
-    printf("\n");
+    // Retain the past-event error and avoid displaying a negative countdown.
+    if (days_until_event < 0)
+    {
+        printf("Error: The event date is before the current date.\n");
+    }
+    else
+    {
+        printf("Days until event: %d days\n", days_until_event);
+    }
 
-    // Display the appropriate event status.
+    // Use the exact status thresholds from Assessment Sheet 4.
     if (days_until_event < 0)
     {
         printf("Status: Already passed\n");
     }
     else if (days_until_event == 0)
     {
-        printf("Days until event: 0 days\n");
         printf("Status: Today\n");
     }
-    else if (days_until_event <= 7)
+    else if (days_until_event <= coming_soon_limit)
     {
-        printf("Days until event: %d days\n", days_until_event);
         printf("Status: Coming soon\n");
     }
     else
     {
-        printf("Days until event: %d days\n", days_until_event);
         printf("Status: Later in the year\n");
     }
 
